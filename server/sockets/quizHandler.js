@@ -7,15 +7,22 @@ module.exports = (io) => {
     if (!room || !room.currentTopicId) return;
 
     const topic = SAMPLE_TOPICS.find(t => t.id === room.currentTopicId);
+    if (!topic) return;
 
-    if (!topic || room.currentQIndexInTopic >= topic.questions.length) {
+    // 💡 이전 문제가 완료(QUESTION_DONE) 상태였을 때만 문제 인덱스를 1 증가시킴
+    if (room.status === 'QUESTION_DONE') {
+      room.currentQIndexInTopic += 1;
+    }
+
+    if (room.currentQIndexInTopic >= topic.questions.length) {
       room.completedTopics.add(room.currentTopicId);
       room.currentTopicId = null;
       room.currentQIndexInTopic = 0;
 
       if (room.completedTopics.size >= SAMPLE_TOPICS.length) {
         room.status = 'GAME_FINISHED';
-        io.to(roomKey).emit('GAME_FINISHED', { players: room.players });
+        const awards = roomManager.calculateAwards(roomKey);
+        io.to(roomKey).emit('GAME_FINISHED', { players: room.players, awards });
         return;
       }
 
@@ -31,22 +38,25 @@ module.exports = (io) => {
     room.status = 'QUESTION_ACTIVE';
     room.buzzerLocked = false;
     room.buzzerWinner = null;
+    room.playerAnswers = {};
+    room.questionStartTime = Date.now();
     room.bannedPlayerIdsForCurrentQ.clear();
 
-    io.to(roomKey).emit('QUESTION_STARTED', {
+    const qPayload = {
       topicTitle: topic.title,
       qIndex: room.currentQIndexInTopic,
       totalQ: topic.questions.length,
       title: q.title,
+      quizType: q.quizType,
       mediaType: q.mediaType,
-      mediaUrl: q.mediaUrl
-    });
+      mediaUrl: q.mediaUrl,
+      options: q.options || []
+    };
+
+    io.to(roomKey).emit('QUESTION_STARTED', qPayload);
 
     io.to(`${roomKey}-host`).emit('HOST_QUESTION_INFO', {
-      topicTitle: topic.title,
-      qIndex: room.currentQIndexInTopic,
-      totalQ: topic.questions.length,
-      mediaType: q.mediaType,
+      ...qPayload,
       answer: q.answer,
       hint: q.hint
     });
@@ -125,20 +135,35 @@ module.exports = (io) => {
       }
     });
 
+    socket.on('SUBMIT_ANSWER', ({ roomId, playerId, answerIndex }) => {
+      const roomKey = String(roomId);
+      const submitInfo = roomManager.submitAnswer(roomKey, playerId, answerIndex);
+      if (submitInfo) {
+        io.to(roomKey).emit('ANSWER_SUBMITTED_UPDATE', submitInfo);
+        socket.emit('MY_ANSWER_SUBMITTED', { selected: answerIndex });
+      }
+    });
+
     socket.on('JUDGE_ANSWER', ({ roomId, isCorrect }) => {
       const roomKey = String(roomId);
       const result = roomManager.judgeAnswer(roomKey, isCorrect);
       if (!result) return;
 
-      if (result.isCorrect) {
-        io.to(roomKey).emit('JUDGMENT_RESULT', result);
-      } else {
-        io.to(roomKey).emit('JUDGMENT_RESULT', result);
+      io.to(roomKey).emit('JUDGMENT_RESULT', result);
 
+      if (!result.isCorrect) {
         setTimeout(() => {
           roomManager.clearPenalty(roomKey, result.failedPlayerId);
           io.to(roomKey).emit('PLAYER_PENALTY_EXPIRED', { playerId: result.failedPlayerId });
         }, 3000);
+      }
+    });
+
+    socket.on('JUDGE_CHOICE', ({ roomId }) => {
+      const roomKey = String(roomId);
+      const result = roomManager.judgeChoiceQuestion(roomKey);
+      if (result) {
+        io.to(roomKey).emit('CHOICE_JUDGMENT_RESULT', result);
       }
     });
 
@@ -150,13 +175,12 @@ module.exports = (io) => {
       const topic = SAMPLE_TOPICS.find(t => t.id === room.currentTopicId);
       const q = topic ? topic.questions[room.currentQIndexInTopic] : null;
 
-      room.currentQIndexInTopic += 1;
       room.status = 'QUESTION_DONE';
       room.buzzerWinner = null;
 
       io.to(roomKey).emit('JUDGMENT_RESULT', {
         isSkip: true,
-        correctAnswer: q ? q.answer : '',
+        correctAnswer: q ? (q.quizType === 'BUZZER' ? q.answer : q.options[q.answer]) : '',
         players: room.players
       });
     });

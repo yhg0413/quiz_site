@@ -34,7 +34,8 @@ export default function HostView() {
           mediaType: data.currentQuestion.mediaType,
           options: data.currentQuestion.options || [],
           answer: data.currentAnswer,
-          hint: data.currentHint
+          hint: data.currentHint,
+          score: data.currentQuestion.score || 10
         });
       }
     });
@@ -150,6 +151,9 @@ export default function HostView() {
                 <span className="text-xs font-bold bg-cyan-500/20 text-cyan-400 px-3 py-1 rounded-full border border-cyan-500/30">
                   {answerInfo.quizType}
                 </span>
+                <span className="text-xs font-bold bg-yellow-500/20 text-yellow-300 px-3 py-1 rounded-full border border-yellow-500/30">
+                  배점: {answerInfo.score || 10}pt
+                </span>
               </div>
 
               <div className="text-2xl font-black text-rose-500">
@@ -199,13 +203,13 @@ export default function HostView() {
                 onClick={handleJudgeChoice} 
                 className="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-black py-6 rounded-2xl text-xl flex justify-center items-center gap-2 shadow-lg"
               >
-                <Send className="w-6 h-6" /> 정답 공개 및 채점 진행
+                <Send className="w-6 h-6" /> 정답 공개 및 채점 진행 (+{answerInfo.score || 10}pt)
               </button>
             )}
 
             {answerInfo.quizType === 'BUZZER' && buzzerWinner && (
               <div className="flex gap-4">
-                <button onClick={() => handleJudgeBuzzer(true)} className="flex-1 bg-emerald-600 hover:bg-emerald-500 text-white font-black py-6 rounded-2xl text-xl flex justify-center items-center gap-2 shadow-lg"><CheckCircle className="w-7 h-7" /> 정답 (+10pt)</button>
+                <button onClick={() => handleJudgeBuzzer(true)} className="flex-1 bg-emerald-600 hover:bg-emerald-500 text-white font-black py-6 rounded-2xl text-xl flex justify-center items-center gap-2 shadow-lg"><CheckCircle className="w-7 h-7" /> 정답 (+{answerInfo.score || 10}pt)</button>
                 <button onClick={() => handleJudgeBuzzer(false)} className="flex-1 bg-rose-600 hover:bg-rose-500 text-white font-black py-6 rounded-2xl text-xl flex justify-center items-center gap-2 shadow-lg"><XCircle className="w-7 h-7" /> 오답 (페널티)</button>
               </div>
             )}

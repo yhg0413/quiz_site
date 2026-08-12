@@ -81,7 +81,8 @@ class RoomManager {
           quizType: q.quizType,
           mediaType: q.mediaType,
           mediaUrl: q.mediaUrl,
-          options: q.options || []
+          options: q.options || [],
+          score: q.score || 10 // 💡 동기화 시 배점 전달
         };
         if (role === 'HOST') {
           syncData.currentAnswer = q.answer;
@@ -98,12 +99,12 @@ class RoomManager {
     if (!room) return null;
 
     const player = room.players[playerId];
+
     if (player && player.stats) {
       player.stats.buzzerClicks += 1;
     }
 
     if (room.status !== 'QUESTION_ACTIVE' || room.buzzerLocked || room.bannedPlayerIdsForCurrentQ.has(playerId)) {
-    // 0.3초 차이로 아쉽게 놓친 횟수 집계
       if (room.buzzerHitTime > 0 && Date.now() - room.buzzerHitTime <= 300) {
         if (player && player.stats) player.stats.closeCalls += 1;
       }
@@ -142,17 +143,21 @@ class RoomManager {
     };
   }
 
-  // 버저형 채점 (인덱스 미리 증가시키지 않음)
+  // 💡 버저형 정답 시 문제 배점(qScore) 가산
   judgeAnswer(roomId, isCorrect) {
     const room = this.getRoom(roomId);
     if (!room || room.status !== 'BUZZER_HIT' || !room.buzzerWinner) return null;
+
+    const topic = SAMPLE_TOPICS.find(t => t.id === room.currentTopicId);
+    const q = topic ? topic.questions[room.currentQIndexInTopic] : null;
+    const qScore = q ? (q.score || 10) : 10;
 
     const winnerPlayerId = room.buzzerWinner.playerId;
     const player = room.players[winnerPlayerId];
 
     if (isCorrect) {
       if (player) {
-        player.score += 10;
+        player.score += qScore;
         if (player.stats) player.stats.correctCount += 1;
       }
       room.status = 'QUESTION_DONE';
@@ -160,6 +165,7 @@ class RoomManager {
       return {
         isCorrect: true,
         winnerName: room.buzzerWinner.name,
+        gainedScore: qScore,
         players: room.players
       };
     } else {
@@ -178,7 +184,7 @@ class RoomManager {
     }
   }
 
-  // 객관식 / OX 채점 (인덱스 미리 증가시키지 않음)
+  // 💡 객관식/OX 정답 시 문제 배점(qScore) 가산
   judgeChoiceQuestion(roomId) {
     const room = this.getRoom(roomId);
     if (!room || room.status !== 'QUESTION_ACTIVE') return null;
@@ -187,6 +193,7 @@ class RoomManager {
     const q = topic ? topic.questions[room.currentQIndexInTopic] : null;
     if (!q) return null;
 
+    const qScore = q.score || 10;
     const correctAnswer = q.answer;
     const results = {};
 
@@ -196,7 +203,7 @@ class RoomManager {
       const isCorrect = playerAns === correctAnswer;
 
       if (isCorrect) {
-        player.score += 10;
+        player.score += qScore;
         if (player.stats) player.stats.correctCount += 1;
       } else {
         if (player.stats) player.stats.wrongCount += 1;
@@ -213,6 +220,7 @@ class RoomManager {
 
     return {
       correctAnswer,
+      gainedScore: qScore,
       results,
       players: room.players
     };

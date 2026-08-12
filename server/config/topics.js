@@ -1,3 +1,5 @@
+// server/config/topics.js
+
 // Quiz Type Enum
 const QUIZ_TYPE = Object.freeze({
   BUZZER: 'BUZZER', // 버저 선점형
@@ -16,77 +18,67 @@ const MEDIA_TYPE = Object.freeze({
 const SAMPLE_TOPICS = [
   {
     id: "topic_1",
-    title: "🎵 음원 & 영상 버저 퀴즈",
+    title: "🔰 튜토리얼 (연습 문제)",
     questions: [
       {
         id: 101,
-        quizType: QUIZ_TYPE.BUZZER,
-        mediaType: MEDIA_TYPE.YOUTUBE_AUDIO,
-        title: "이 노래의 제목은 무엇일까요?",
-        mediaUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ",
-        answer: "Never Gonna Give You Up",
-        hint: "ㄴㅂㄱㄴ"
+        quizType: QUIZ_TYPE.OX,
+        mediaType: MEDIA_TYPE.NONE,
+        title: "[OX 연습] 모바일 화면에서 O 또는 X를 눌러 참여하는 퀴즈입니다.",
+        mediaUrl: "",
+        options: ["O", "X"],
+        answer: 0, // 0 = O
+        hint: "O를 눌러보세요!",
+        score: 0
       },
       {
         id: 102,
+        quizType: QUIZ_TYPE.CHOICE,
+        mediaType: MEDIA_TYPE.IMAGE,
+        title: "[객관식 연습] 사진을 확인하고 4개 보기 중 정답을 선택하는 퀴즈입니다.",
+        mediaUrl: "https://via.placeholder.com/600x350?text=Tutorial+Quiz",
+        options: ["1. 1번 보기", "2. 2번 보기", "3. 정답 (3번)", "4. 4번 보기"],
+        answer: 2, // 3번 보기
+        hint: "3번 보기를 눌러보세요!",
+        score: 0
+      },
+      {
+        id: 103,
+        quizType: QUIZ_TYPE.BUZZER,
+        mediaType: MEDIA_TYPE.YOUTUBE_AUDIO,
+        title: "[음원 버저 연습] 소리를 듣고 모바일 버저를 가장 빠르게 누른 사람에게 발언권이 부여됩니다.",
+        mediaUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ",
+        answer: "연습용 정답",
+        hint: "버저를 눌러보세요!",
+        score: 0
+      },
+      {
+        id: 104,
         quizType: QUIZ_TYPE.BUZZER,
         mediaType: MEDIA_TYPE.YOUTUBE_VIDEO,
-        title: "다음 영상 속 가수의 이름은 무엇일까요?",
+        title: "[영상 버저 연습] 영상을 감상하다가 정답을 알겠다면 버저를 터치해주세요!",
         mediaUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ",
         answer: "릭 애스트리",
-        hint: "ㄹㅇㅅㅌㄹ"
+        hint: "ㄹㅇㅅㅌㄹ",
+        score: 0
       }
     ]
   },
   {
     id: "topic_2",
-    title: "📜 상식 & 역사 (객관식 & OX)",
+    title: "🔰 튜토리얼 (연습 문제)",
     questions: [
       {
-        id: 201,
-        quizType: QUIZ_TYPE.CHOICE,
-        mediaType: MEDIA_TYPE.NONE,
-        title: "다음 중 조선시대 4대문이 아닌 것은?",
-        mediaUrl: "",
-        options: ["1. 흥인지문", "2. 숭례문", "3. 광화문", "4. 숙정문"],
-        answer: 2, // 0-based index (3. 광화문)
-        hint: "궁궐의 정문입니다."
-      },
-      {
-        id: 202,
+        id: 101,
         quizType: QUIZ_TYPE.OX,
         mediaType: MEDIA_TYPE.NONE,
-        title: "토마토는 식물학적으로 과일이 아닌 채소(채소류)이다?",
+        title: "[OX 연습] 모바일 화면에서 O 또는 X를 눌러 참여하는 퀴즈입니다.",
         mediaUrl: "",
         options: ["O", "X"],
         answer: 0, // 0 = O
-        hint: "과채류 구분을 떠올려보세요."
-      }
-    ]
-  },
-  {
-    id: "topic_3",
-    title: "🖼️ 이미지 관찰 퀴즈",
-    questions: [
-      {
-        id: 301,
-        quizType: QUIZ_TYPE.CHOICE,
-        mediaType: MEDIA_TYPE.IMAGE,
-        title: "다음 그림 속 인물은 어느 시대의 장군일까요?",
-        mediaUrl: "https://via.placeholder.com/600x350?text=History+Image",
-        options: ["1. 고구려", "2. 백제", "3. 신라", "4. 조선"],
-        answer: 3, // 4. 조선
-        hint: "임진왜란과 관련이 깊습니다."
+        hint: "O를 눌러보세요!",
+        score: 0
       },
-      {
-        id: 302,
-        quizType: QUIZ_TYPE.BUZZER,
-        mediaType: MEDIA_TYPE.IMAGE,
-        title: "사진 속 인물의 이름을 버저를 누르고 맞혀주세요!",
-        mediaUrl: "https://via.placeholder.com/600x350?text=Person",
-        answer: "홍길동",
-        hint: "ㅎㄱㄷ"
-      }
     ]
   }
 ];

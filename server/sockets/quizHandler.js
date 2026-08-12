@@ -9,7 +9,6 @@ module.exports = (io) => {
     const topic = SAMPLE_TOPICS.find(t => t.id === room.currentTopicId);
     if (!topic) return;
 
-    // 💡 이전 문제가 완료(QUESTION_DONE) 상태였을 때만 문제 인덱스를 1 증가시킴
     if (room.status === 'QUESTION_DONE') {
       room.currentQIndexInTopic += 1;
     }
@@ -50,7 +49,8 @@ module.exports = (io) => {
       quizType: q.quizType,
       mediaType: q.mediaType,
       mediaUrl: q.mediaUrl,
-      options: q.options || []
+      options: q.options || [],
+      score: q.score || 10 // 💡 소켓 이벤트에 배점 데이터 전달
     };
 
     io.to(roomKey).emit('QUESTION_STARTED', qPayload);

@@ -3,7 +3,7 @@ import { useParams } from 'react-router-dom';
 import { QRCodeSVG } from 'qrcode.react';
 import confetti from 'canvas-confetti';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Volume2, Trophy, Radio, BellRing, Sparkles, Award, Crown, CheckCircle2 } from 'lucide-react';
+import { Volume2, Trophy, Radio, BellRing, Sparkles, Award, Crown, CheckCircle2, Zap } from 'lucide-react';
 import { socket } from './socket';
 
 export default function DisplayView() {
@@ -90,13 +90,13 @@ export default function DisplayView() {
       controlYoutubeIframe('PAUSE');
     });
 
-    socket.on('JUDGMENT_RESULT', ({ isCorrect, isSkip, correctAnswer, winnerName, failedPlayerName, players: updatedPlayers }) => {
+    socket.on('JUDGMENT_RESULT', ({ isCorrect, isSkip, correctAnswer, gainedScore, winnerName, failedPlayerName, players: updatedPlayers }) => {
       setPlayers(updatedPlayers);
       if (isSkip) {
         setStatusText(`패스! 정답: [ ${correctAnswer} ]`);
         setBuzzerWinner(null);
       } else if (isCorrect) {
-        setStatusText(`정답입니다! (${winnerName} +10pt)`);
+        setStatusText(`정답입니다! (${winnerName} +${gainedScore || 10}pt)`);
         setBuzzerWinner(null);
         triggerConfetti();
       } else {
@@ -105,11 +105,11 @@ export default function DisplayView() {
       }
     });
 
-    socket.on('CHOICE_JUDGMENT_RESULT', ({ correctAnswer, results, players: updatedPlayers }) => {
+    socket.on('CHOICE_JUDGMENT_RESULT', ({ correctAnswer, gainedScore, results, players: updatedPlayers }) => {
       setStatus('QUESTION_DONE');
       setPlayers(updatedPlayers);
       setChoiceResult({ correctAnswer, results });
-      setStatusText('정답 공개 및 채점 완료!');
+      setStatusText(`정답 공개 및 채점 완료! (정답자 +${gainedScore || 10}pt)`);
       triggerConfetti();
     });
 
@@ -130,7 +130,6 @@ export default function DisplayView() {
       setStatusText('주제를 선택해 주세요...');
     });
 
-    // 💡 게임 완주 시 버저 팝업 및 이전 문제 정보 초기화
     socket.on('GAME_FINISHED', ({ players: finalPlayers, awards: finalAwards }) => {
       setStatus('GAME_FINISHED');
       if (finalPlayers) setPlayers(finalPlayers);
@@ -250,9 +249,17 @@ export default function DisplayView() {
 
         {(status === 'QUESTION_ACTIVE' || status === 'BUZZER_HIT' || status === 'QUESTION_DONE') && question && (
           <div className="flex flex-col items-center justify-center w-full my-auto text-center space-y-4">
-            <span className="bg-pink-600/20 text-pink-400 border border-pink-500/30 px-4 py-1.5 rounded-full font-bold text-sm tracking-wide">
-              {question.topicTitle} (Q{question.qIndex + 1}/{question.totalQ}) - [{question.quizType}]
-            </span>
+            {/* 💡 배점 및 퀴즈 정보 뱃지 표출 */}
+            <div className="flex items-center gap-3">
+              <span className="bg-pink-600/20 text-pink-400 border border-pink-500/30 px-4 py-1.5 rounded-full font-bold text-sm tracking-wide">
+                {question.topicTitle} (Q{question.qIndex + 1}/{question.totalQ}) - [{question.quizType}]
+              </span>
+              <span className="bg-yellow-500/20 text-yellow-300 border border-yellow-500/40 px-4 py-1.5 rounded-full font-black text-sm tracking-wider flex items-center gap-1.5 shadow-lg animate-bounce">
+                <Zap className="w-4 h-4 text-yellow-400 fill-current" />
+                {question.score || 10}점짜리 문제
+              </span>
+            </div>
+
             <h2 className="text-4xl font-black text-white max-w-3xl leading-snug tracking-tight">
               Q. {question.title}
             </h2>
@@ -382,7 +389,6 @@ export default function DisplayView() {
           </div>
         )}
 
-        {/* 💡 게임 진행 중에만 버저 팝업 노출 */}
         <AnimatePresence>
           {status !== 'GAME_FINISHED' && buzzerWinner && (
             <motion.div initial={{ scale: 0.5, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.5, opacity: 0 }} className="bg-rose-600 border-2 border-rose-400 text-white px-10 py-5 rounded-2xl font-black text-3xl shadow-[0_0_50px_rgba(225,29,72,0.6)] flex items-center gap-4 mb-4">

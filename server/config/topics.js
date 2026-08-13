@@ -66,7 +66,58 @@ const SAMPLE_TOPICS = [
   },
   {
     id: "topic_2",
-    title: "🔰 튜토리얼 (연습 문제)",
+    title: "상식",
+    questions: [
+      {
+        id: 101,
+        quizType: QUIZ_TYPE.OX,
+        mediaType: MEDIA_TYPE.NONE,
+        title: "[OX 연습] 모바일 화면에서 O 또는 X를 눌러 참여하는 퀴즈입니다.",
+        mediaUrl: "",
+        options: ["O", "X"],
+        answer: 0, // 0 = O
+        hint: "O를 눌러보세요!",
+        score: 0
+      },
+    ]
+  },
+  {
+    id: "topic_3",
+    title: "게임",
+    questions: [
+      {
+        id: 101,
+        quizType: QUIZ_TYPE.OX,
+        mediaType: MEDIA_TYPE.NONE,
+        title: "[OX 연습] 모바일 화면에서 O 또는 X를 눌러 참여하는 퀴즈입니다.",
+        mediaUrl: "",
+        options: ["O", "X"],
+        answer: 0, // 0 = O
+        hint: "O를 눌러보세요!",
+        score: 0
+      },
+    ]
+  },
+  {
+    id: "topic_4",
+    title: "영화",
+    questions: [
+      {
+        id: 101,
+        quizType: QUIZ_TYPE.OX,
+        mediaType: MEDIA_TYPE.NONE,
+        title: "[OX 연습] 모바일 화면에서 O 또는 X를 눌러 참여하는 퀴즈입니다.",
+        mediaUrl: "",
+        options: ["O", "X"],
+        answer: 0, // 0 = O
+        hint: "O를 눌러보세요!",
+        score: 0
+      },
+    ]
+  },
+  {
+    id: "topic_5",
+    title: "인물 또는 캐릭터",
     questions: [
       {
         id: 101,

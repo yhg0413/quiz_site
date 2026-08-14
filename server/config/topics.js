@@ -757,7 +757,7 @@ const SAMPLE_TOPICS = [
         options: [],
         answer: "시운", // 0 = O
         hint: "",
-        score: 0
+        score: 25
       },{
         id: 502,
         quizType: QUIZ_TYPE.BUZZER,
@@ -767,7 +767,7 @@ const SAMPLE_TOPICS = [
         options: [],
         answer: "Zort", // 0 = O
         hint: "O를 눌러보세요!",
-        score: 0
+        score: 25
       },{
         id: 503,
         quizType: QUIZ_TYPE.BUZZER,
@@ -777,7 +777,7 @@ const SAMPLE_TOPICS = [
         options: [],
         answer: "라이어스 바", // 0 = O
         hint: "O를 눌러보세요!",
-        score: 0
+        score: 25
       },{
         id: 504,
         quizType: QUIZ_TYPE.BUZZER,
@@ -787,7 +787,7 @@ const SAMPLE_TOPICS = [
         options: [],
         answer: "헤르에", // 0 = O
         hint: "O를 눌러보세요!",
-        score: 0
+        score: 25
       },{
         id: 505,
         quizType: QUIZ_TYPE.BUZZER,
@@ -797,7 +797,7 @@ const SAMPLE_TOPICS = [
         options: [],
         answer: "발헤임", // 0 = O
         hint: "O를 눌러보세요!",
-        score: 0
+        score: 25
       },{
         id: 506,
         quizType: QUIZ_TYPE.BUZZER,
@@ -807,7 +807,7 @@ const SAMPLE_TOPICS = [
         options: [],
         answer: "사키샤키", // 0 = O
         hint: "O를 눌러보세요!",
-        score: 0
+        score: 25
       },{
         id: 507,
         quizType: QUIZ_TYPE.BUZZER,
@@ -817,7 +817,7 @@ const SAMPLE_TOPICS = [
         options: [],
         answer: "박박샤키 딱딱샤키 각각샤키", // 0 = O
         hint: "O를 눌러보세요!",
-        score: 0
+        score: 25
       },
     ]
   }
